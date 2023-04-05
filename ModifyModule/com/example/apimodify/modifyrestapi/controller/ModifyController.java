@@ -7,8 +7,6 @@ import com.example.apimodify.modifyrestapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +21,14 @@ public class ModifyController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @PostMapping("/modify")
     public ResponseEntity<?> modifyUser(@RequestBody Modify modify) {
+
+        System.out.println(modify);
+        System.out.println(userRepository.count());
 
         UserJPA user;
         try {
