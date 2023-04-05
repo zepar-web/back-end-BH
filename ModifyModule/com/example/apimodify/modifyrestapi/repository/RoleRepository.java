@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<RoleJPA, Long> {
-    Optional<RoleJPA> findByName(String name);
+public interface RoleRepository extends JpaRepository<RoleJPA, Integer> {
+    Optional<RoleJPA> findById(int role_id);
 }
