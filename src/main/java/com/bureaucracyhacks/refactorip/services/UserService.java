@@ -112,21 +112,6 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
-    public void makeAdmin(String name)
-    {
-        UserJPA user;
-        try {
-            user = userRepository.findByUsername(name).orElseThrow();
-        }
-        catch(NoSuchElementException e)
-        {
-            throw new UserNotFoundException();
-        }
-        RoleJPA role = roleRepository.findByName("ROLE_ADMIN").orElseThrow();
-        user.setRole(role);
-        userRepository.save(user);
-    }
-
     public boolean isAdmin(String usernameOrEmail) {
         UserJPA user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
