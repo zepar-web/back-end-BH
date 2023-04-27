@@ -1,8 +1,11 @@
 package com.bureaucracyhacks.refactorip.services;
 
+import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
+import com.bureaucracyhacks.refactorip.models.DocumentJPA;
 import com.bureaucracyhacks.refactorip.models.RoleJPA;
 import com.bureaucracyhacks.refactorip.models.UserJPA;
+import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
 import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +34,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    @Autowired
+    private DocumentRepository documentRepository;
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, DocumentRepository documentRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.documentRepository = documentRepository;
     }
 
 
@@ -117,5 +124,29 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
 
         return user.getRoles().stream().anyMatch(role -> role.getRole_id() == 1L);
+    }
+
+    public void addDocument(String username, String documentName) {
+        UserJPA user;
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new UserNotFoundException();
+        }
+
+        DocumentJPA document;
+        try {
+            document = documentRepository.findByName(documentName).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new DocumentNotFoundException();
+        }
+
+        user.getDocuments().add(document);
+
+        userRepository.save(user);
     }
 }

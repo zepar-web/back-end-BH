@@ -3,6 +3,7 @@ package com.bureaucracyhacks.refactorip.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Data
@@ -26,16 +27,29 @@ public class UserJPA {
     private String created_at;
 
 
-
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id"))
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    )
     private Set<RoleJPA> roles;
 
     public void setRole(RoleJPA role) {
         roles.clear();
         roles.add(role);
+    }
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
+    @JoinTable(name = "user_documents",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id", referencedColumnName = "document_id")
+    )
+    private Set<DocumentJPA> documents;
+
+    public void setDocument(DocumentJPA document) {
+        documents.clear();
+        documents.add(document);
     }
 }
