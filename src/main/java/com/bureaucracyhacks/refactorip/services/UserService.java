@@ -8,6 +8,9 @@ import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
 import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,13 +21,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static javax.crypto.Cipher.SECRET_KEY;
+
 @Service
 public class UserService implements UserDetailsService {
 
+    private static final long EXPIRE_DURATION = 360000;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -53,7 +61,19 @@ public class UserService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getRole_id() == 0 ? "USER" : "ADMIN"))
                 .collect(Collectors.toSet());
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
+
+    public String generateAccessToken(UserJPA user) {
+
+        return Jwts.builder()
+                .setSubject(String.format("%s", user.getUsername()))
+                .setIssuer("CodeJava")
+                .claim("roles", getUserRole(user.getUsername()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
+                .signWith(SignatureAlgorithm.HS512, "secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey")
+                .compact();
     }
 
     public void registerUser(String name, String surname, String username, String email, String password, String phone_number) {
@@ -67,6 +87,8 @@ public class UserService implements UserDetailsService {
         String text = "2011-10-02 18:48:05.123456";
         Timestamp ts = Timestamp.valueOf(text);
         user.setCreated_at(ts.toString());
+        RoleJPA userRole = roleRepository.findByName("ROLE_USER").orElseThrow();
+        user.setRoles(Collections.singleton(userRole));
         userRepository.save(user);
     }
 
@@ -145,8 +167,20 @@ public class UserService implements UserDetailsService {
             throw new DocumentNotFoundException();
         }
 
-        user.getDocuments().add(document);
+        user.addDocument(document);
 
         userRepository.save(user);
+    }
+
+    public String getUserRole(String username) {
+        UserJPA user;
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new UserNotFoundException();
+        }
+        return user.getRoles().stream().findFirst().get().getName();
     }
 }

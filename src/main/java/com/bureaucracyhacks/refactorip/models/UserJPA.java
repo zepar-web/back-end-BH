@@ -27,6 +27,7 @@ public class UserJPA {
     private String created_at;
 
 
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 
     @JoinTable(name = "users_roles",
@@ -48,8 +49,7 @@ public class UserJPA {
     )
     private Set<DocumentJPA> documents;
 
-    public void setDocument(DocumentJPA document) {
-        documents.clear();
+    public void addDocument(DocumentJPA document) {
         documents.add(document);
     }
 }

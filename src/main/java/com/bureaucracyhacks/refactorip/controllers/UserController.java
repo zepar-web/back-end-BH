@@ -2,10 +2,14 @@ package com.bureaucracyhacks.refactorip.controllers;
 
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
+import com.bureaucracyhacks.refactorip.models.RoleJPA;
+import com.bureaucracyhacks.refactorip.models.UserJPA;
+import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +30,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RoleRepository roleRepository;
 
     @PostMapping("/login")
     public ResponseEntity<String> authenticateUser(@RequestParam String usernameOrEmail, @RequestParam String password) {
@@ -36,12 +42,21 @@ public class UserController {
                             password
                     )
             );
+            UserJPA user = new UserJPA();
+            user.setUsername(usernameOrEmail);
+
             if(userService.isAdmin(usernameOrEmail))
             {
+                RoleJPA userRole = roleRepository.findByName("ROLE_ADMIN").orElseThrow();
+                user.setRoles(Collections.singleton(userRole));
+                System.out.println(userService.generateAccessToken(user));
                 return ResponseEntity.ok("Logged in as admin!");
             }
             else
             {
+                RoleJPA userRole = roleRepository.findByName("ROLE_USER").orElseThrow();
+                user.setRoles(Collections.singleton(userRole));
+                System.out.println(userService.generateAccessToken(user));
                 return ResponseEntity.ok("Logged in as user!");
             }
         }
