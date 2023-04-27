@@ -1,5 +1,6 @@
 package com.bureaucracyhacks.refactorip.controllers;
 
+import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import com.bureaucracyhacks.refactorip.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,24 @@ public class UserController {
         }
 
         return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
+    }
+
+    @PostMapping("/addDocument")
+    public ResponseEntity<?> addDocument(@RequestParam String username, @RequestParam String documentName) {
+
+        try {
+            userService.addDocument(username, documentName);
+        }
+        catch(UserNotFoundException e)
+        {
+            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }
+        catch(DocumentNotFoundException e)
+        {
+            return new ResponseEntity<>("Document not found!", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("Document added successfully!", HttpStatus.OK);
     }
 
 }
