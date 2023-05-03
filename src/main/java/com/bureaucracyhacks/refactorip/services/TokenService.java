@@ -1,15 +1,11 @@
 package com.bureaucracyhacks.refactorip.services;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
 
-
-public class TokenHelper {
+public class TokenService {
     private static final String SECRET_KEY = "fdeaa31457c1366bd885e8641e19f7718c602e68551f353735c4a388a7d0bc25fdeaa31457c1366bd885e8641e19f7718c602e68551f353735c4a388a7d0bc25";
 
 

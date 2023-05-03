@@ -1,7 +1,6 @@
 package com.bureaucracyhacks.refactorip.config;
 
-import com.bureaucracyhacks.refactorip.services.TokenHelper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bureaucracyhacks.refactorip.services.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,8 +23,8 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
     @Bean
-    public static TokenHelper tokenHelper() {
-        return new TokenHelper();
+    public static TokenService tokenHelper() {
+        return new TokenService();
     }
     @Bean
     public static PasswordEncoder passwordEncoder() {

@@ -18,4 +18,5 @@ public class DocumentJPA {
     private String description;
     private double price;
     private int institution_id;
+    private String path;
 }

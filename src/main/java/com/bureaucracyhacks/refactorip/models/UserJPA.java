@@ -14,7 +14,6 @@ import java.util.Set;
 
 })
 public class UserJPA {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long user_id;
@@ -25,11 +24,10 @@ public class UserJPA {
     private String password;
     private String phone_number;
     private String created_at;
-
+    private String city;
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
@@ -42,7 +40,6 @@ public class UserJPA {
     }
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-
     @JoinTable(name = "user_documents",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id", referencedColumnName = "document_id")

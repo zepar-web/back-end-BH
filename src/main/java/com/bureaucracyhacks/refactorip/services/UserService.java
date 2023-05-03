@@ -1,17 +1,21 @@
 package com.bureaucracyhacks.refactorip.services;
 
+import com.bureaucracyhacks.refactorip.models.RoleJPA;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.validator.routines.EmailValidator;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+
+
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import com.bureaucracyhacks.refactorip.models.DocumentJPA;
-import com.bureaucracyhacks.refactorip.models.RoleJPA;
 import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
 import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,12 +25,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.Date;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static javax.crypto.Cipher.SECRET_KEY;
@@ -81,21 +85,26 @@ public class UserService implements UserDetailsService {
                 .compact();
     }
 
-    public void registerUser(String name, String surname, String username, String email, String password, String phone_number) {
+    public void registerUser(String name, String surname, String username, String email, String password, String phone_number, String city) {
         UserJPA user = new UserJPA();
+        RoleJPA role = roleRepository.findByName("ROLE_USER").orElseThrow();
+
         user.setName(name);
         user.setSurname(surname);
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setPhone_number(phone_number);
+        user.setCity(city);
+        user.setRoles(Collections.singleton(role));
+
         String text = "2011-10-02 18:48:05.123456";
         Timestamp ts = Timestamp.valueOf(text);
         user.setCreated_at(ts.toString());
-        RoleJPA userRole = roleRepository.findByName("ROLE_USER").orElseThrow();
-        user.setRoles(Collections.singleton(userRole));
+
         userRepository.save(user);
     }
+
 
     public boolean isUsernameTaken(String username) {
         return userRepository.findByUsername(username).isPresent();
@@ -105,7 +114,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public void updateUser(String username, String email, String phone_number, String password, String name, String surname) {
+    public void updateUser(String username, String email, String phone_number, String password, String name, String surname, String city) {
         UserJPA user;
         try {
             user = userRepository.findByUsername(username).orElseThrow();
@@ -129,6 +138,9 @@ public class UserService implements UserDetailsService {
 
         if(password != null)
             user.setPassword(passwordEncoder.encode(password));
+
+        if(city != null)
+            user.setCity(city);
 
 
         userRepository.save(user);
@@ -187,5 +199,46 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException();
         }
         return user.getRoles().stream().findFirst().get().getName();
+    }
+
+    public boolean isValidName(String name) {
+        return name.matches("^[A-Za-z]{2,}(\\s*)([A-Za-z]{1,})+$") && name.length() <= 60;
+    }
+
+    public boolean isValidSurname(String surname) {
+        return surname.matches("^[A-Za-z]{2,}(\\s*)([A-Za-z]{1,})+$") && surname.length() <= 60;
+    }
+
+    public boolean isValidUsername(String username) {
+        return username.matches("^[a-zA-Z0-9_]*$") && username.length() > 5 && username.length() <= 30;
+    }
+
+    public boolean isValidEmail(String email) {
+        return EmailValidator.getInstance().isValid(email);
+    }
+
+    public boolean isValidPassword(String password) {
+        return password.length() >= 8 && password.length() <= 255 && password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z?!@#$%^&*\\d]{8,}$");
+    }
+
+    public boolean isValidPhoneNumber(String phone_number) {
+        PhoneNumberUtil numberUtil = PhoneNumberUtil.getInstance();
+        PhoneNumber phoneNumber;
+        try {
+            phoneNumber = numberUtil.parse(phone_number, "RO");
+        } catch (NumberParseException e) {
+            return false;
+        }
+        return numberUtil.isValidNumber(phoneNumber);
+    }
+
+    public boolean isValidCity(String city) throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get("src/main/java/com/bureaucracyhacks/refactorip/utils/cities.txt"));
+        String[] cities = lines.toArray(new String[0]);
+        for (String s : cities) {
+            if (s.equals(city))
+                return true;
+        }
+        return false;
     }
 }

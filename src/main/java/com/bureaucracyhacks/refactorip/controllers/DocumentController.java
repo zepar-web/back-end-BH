@@ -38,7 +38,4 @@ public class DocumentController {
                     return new ResponseEntity<>("Document does not exist!", HttpStatus.BAD_REQUEST);
                 }
         }
-
-
-
 }
