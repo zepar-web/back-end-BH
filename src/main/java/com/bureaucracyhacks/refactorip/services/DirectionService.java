@@ -34,7 +34,7 @@ public class DirectionService
     {
         //TODO make a call to DirectionsService
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey("AIzaSyA3oREFzGR_MXeZgmuBT43oqv9atQroWXQ")
+                .apiKey("YOURKEY5")
                 .build();
         //list to store the waypoints
 
@@ -61,7 +61,7 @@ public class DirectionService
         StringBuilder url = new StringBuilder("https://maps.googleapis.com/maps/api/directions/json?language=ro&origin=");
         url.append(waypoints.get(0)[0].geometry.location); //add the origin as the first waypoint
         url.append("&destination=").append(waypoints.get(waypoints.size() - 1)[0].geometry.location); //add the destination as the last waypoint
-        url.append("&mode=walking&key=").append("AIzaSyA3oREFzGR_MXeZgmuBT43oqv9atQroWXQ");
+        url.append("&mode=walking&key=").append("YOURKEY");
 
         //add the waypoints in between if there are any
         if (waypoints.size() > 2)
