@@ -16,17 +16,17 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-   @PostMapping("/reviewInstitution")
+    @PostMapping("/reviewInstitution")
     public ResponseEntity<String> sendReview (@RequestParam String comment, @RequestParam Integer rating, @RequestParam Long user_id, @RequestParam Long institution_id) {
 
-       try {
-           reviewService.addReview(comment, rating, user_id, institution_id);
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
+        try {
+            reviewService.addReview(comment, rating, user_id, institution_id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-       return ResponseEntity.ok("Review has been posted successfully");
-   }
+        return ResponseEntity.ok("Review has been posted successfully");
+    }
 
 //    To be implemented
 //    @PostMapping("/reviewApp")

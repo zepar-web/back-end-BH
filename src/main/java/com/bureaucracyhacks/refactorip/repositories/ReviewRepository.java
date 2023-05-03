@@ -8,3 +8,4 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<ReviewJPA, Long> {
     Optional<ReviewJPA> findByRating(Integer rating);
 }
+
