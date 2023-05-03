@@ -23,5 +23,7 @@ public class ReviewJPA
             joinColumns = @JoinColumn(name = "feedback_id", referencedColumnName = "feedback_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"))
     private UserJPA users;
+
 }
+
 
