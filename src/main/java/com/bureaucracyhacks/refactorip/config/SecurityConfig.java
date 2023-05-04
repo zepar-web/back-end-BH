@@ -1,6 +1,6 @@
 package com.bureaucracyhacks.refactorip.config;
 
-import com.bureaucracyhacks.refactorip.services.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,10 +22,8 @@ public class SecurityConfig {
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-    @Bean
-    public static TokenService tokenHelper() {
-        return new TokenService();
-    }
+
+
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -41,10 +39,9 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests((authorize) ->
                 authorize
-                    .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").permitAll()
-                            .requestMatchers("/api/doc/**").permitAll()
-                                .anyRequest().authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .anyRequest().authenticated()
             );
         return http.build();
     }

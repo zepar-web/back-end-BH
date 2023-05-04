@@ -1,8 +1,6 @@
 package com.bureaucracyhacks.refactorip.services;
 
 import com.bureaucracyhacks.refactorip.models.RoleJPA;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.validator.routines.EmailValidator;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -28,19 +26,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Key;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static javax.crypto.Cipher.SECRET_KEY;
 
 @Service
 public class UserService implements UserDetailsService {
-
-    private static final long EXPIRE_DURATION = 360000;
-
-    private static final String key = "fdeaa31457c1366bd885e8641e19f7718c602e68551f353735c4a388a7d0bc25fdeaa31457c1366bd885e8641e19f7718c602e68551f353735c4a388a7d0bc25";
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -70,19 +64,7 @@ public class UserService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getRole_id() == 0 ? "USER" : "ADMIN"))
                 .collect(Collectors.toSet());
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-    }
-
-    public String generateAccessToken(UserJPA user) {
-
-        return Jwts.builder()
-                .setSubject(String.format("%s", user.getUsername()))
-                .setIssuer("CodeJava")
-                .claim("roles", getUserRole(user.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 
     public void registerUser(String name, String surname, String username, String email, String password, String phone_number, String city) {
@@ -104,7 +86,6 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
-
 
     public boolean isUsernameTaken(String username) {
         return userRepository.findByUsername(username).isPresent();
@@ -184,21 +165,9 @@ public class UserService implements UserDetailsService {
             throw new DocumentNotFoundException();
         }
 
-        user.addDocument(document);
+        user.getDocuments().add(document);
 
         userRepository.save(user);
-    }
-
-    public String getUserRole(String username) {
-        UserJPA user;
-        try {
-            user = userRepository.findByUsername(username).orElseThrow();
-        }
-        catch(NoSuchElementException e)
-        {
-            throw new UserNotFoundException();
-        }
-        return user.getRoles().stream().findFirst().get().getName();
     }
 
     public boolean isValidName(String name) {
@@ -225,7 +194,7 @@ public class UserService implements UserDetailsService {
         PhoneNumberUtil numberUtil = PhoneNumberUtil.getInstance();
         PhoneNumber phoneNumber;
         try {
-            phoneNumber = numberUtil.parse(phone_number, "RO");
+           phoneNumber = numberUtil.parse(phone_number, "RO");
         } catch (NumberParseException e) {
             return false;
         }
@@ -241,4 +210,5 @@ public class UserService implements UserDetailsService {
         }
         return false;
     }
+
 }
