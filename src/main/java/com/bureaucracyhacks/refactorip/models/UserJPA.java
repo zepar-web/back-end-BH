@@ -3,7 +3,6 @@ package com.bureaucracyhacks.refactorip.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Collection;
 import java.util.Set;
 
 @Data
@@ -25,6 +24,7 @@ public class UserJPA {
     private String password;
     private String phone_number;
     private String created_at;
+    private String city;
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -52,4 +52,5 @@ public class UserJPA {
         documents.clear();
         documents.add(document);
     }
+
 }
