@@ -241,17 +241,20 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
-    public List<Pair<String,String>> generateTodoList(String taskName){
+    public HashMap<String, String> generateTodoList(String taskName){
         try {
             TaskJPA task = taskRepository.findByName(taskName).orElseThrow();
 
             List<DocumentJPA> documents = task.getDocuments();
 
-            List<Pair<String, String>> documentsAndInstitutionLocations = new ArrayList<>();
+            //List<Pair<String, String>> documentsAndInstitutionLocations = new ArrayList<>();
+
+            HashMap<String, String> documentsAndInstitutionLocations = new HashMap<>();
 
             for (DocumentJPA document : documents) {
-                Pair<String, String> documentAndInstitutionLocation = new Pair<>(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
-                documentsAndInstitutionLocations.add(documentAndInstitutionLocation);
+                //Pair<String, String> documentAndInstitutionLocation = new Pair<>(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
+                //documentsAndInstitutionLocations.add(documentAndInstitutionLocation);
+                documentsAndInstitutionLocations.put(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
             }
             return documentsAndInstitutionLocations;
         }

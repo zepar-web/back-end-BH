@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 @RequiredArgsConstructor
@@ -133,7 +134,7 @@ public class UserController {
 
     @PostMapping("/todo-list")
     public ResponseEntity<?> generateTodoList(@RequestParam String userTaskName) {
-        List<Pair<String, String>> documentsAndInstitutionLocation;
+        HashMap<String, String> documentsAndInstitutionLocation;
         try {
             documentsAndInstitutionLocation = userService.generateTodoList(userTaskName);
         } catch (TaskNotFoundException e) {
