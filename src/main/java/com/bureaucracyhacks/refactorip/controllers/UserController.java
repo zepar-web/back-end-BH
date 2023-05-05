@@ -7,8 +7,11 @@ import com.bureaucracyhacks.refactorip.models.DocumentJPA;
 import com.bureaucracyhacks.refactorip.models.RoleJPA;
 import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
+import com.bureaucracyhacks.refactorip.services.AuthenticationService;
+import com.bureaucracyhacks.refactorip.services.TokenService;
 import com.bureaucracyhacks.refactorip.services.UserService;
 import kotlin.Pair;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +29,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
@@ -38,33 +42,15 @@ public class UserController {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private final AuthenticationService authenticationService;
+
+    @Autowired
+    private final TokenService tokenService;
+
     @PostMapping("/login")
-    public ResponseEntity<String> authenticateUser(@RequestParam String usernameOrEmail, @RequestParam String password) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            usernameOrEmail,
-                            password
-                    )
-            );
-            UserJPA user = new UserJPA();
-            user.setUsername(usernameOrEmail);
-
-            if (userService.isAdmin(usernameOrEmail)) {
-                RoleJPA userRole = roleRepository.findByName("ROLE_ADMIN").orElseThrow();
-                user.setRoles(Collections.singleton(userRole));
-                System.out.println(userService.generateAccessToken(user));
-                return ResponseEntity.ok().body("Logged in as admin!\n" + userService.generateAccessToken(user));
-
-            } else {
-                RoleJPA userRole = roleRepository.findByName("ROLE_USER").orElseThrow();
-                user.setRoles(Collections.singleton(userRole));
-                System.out.println(userService.generateAccessToken(user));
-                return ResponseEntity.ok("Logged in as user!");
-            }
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed!");
-        }
+    public ResponseEntity<AuthenticationResponse> authenticateUser(@RequestParam String usernameOrEmail, @RequestParam String password) {
+        return ResponseEntity.ok(authenticationService.authenticateUser(usernameOrEmail, password));
     }
 
     @PostMapping("/register")
@@ -99,6 +85,9 @@ public class UserController {
             return new ResponseEntity<>("City '" + city + "' does not exist in Romania!", HttpStatus.BAD_REQUEST);
         }
 
+        UserJPA user = new UserJPA();
+        user.setName(name);
+        //var jwtToken = tokenService.generateToken(user);
         userService.registerUser(name, surname, username, email, password, phone_number, city);
 
         return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
@@ -150,7 +139,6 @@ public class UserController {
         } catch (TaskNotFoundException e) {
             return new ResponseEntity<>("Task not found!", HttpStatus.BAD_REQUEST);
         }
-
         return ResponseEntity.ok().body(documentsAndInstitutionLocation);
     }
 }

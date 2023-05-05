@@ -59,7 +59,11 @@ public class UserService implements UserDetailsService {
     private InstitutionRepository institutionRepository;
 
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, DocumentRepository documentRepository, TaskRepository taskRepository, InstitutionRepository institutionRepository) {
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       DocumentRepository documentRepository,
+                       TaskRepository taskRepository,
+                       InstitutionRepository institutionRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.documentRepository = documentRepository;
@@ -74,22 +78,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
 
         Set<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole_id() == 0 ? "USER" : "ADMIN"))
+                .map(role -> new SimpleGrantedAuthority(role.getRole_id() == 2 ? "USER" : "ADMIN"))
                 .collect(Collectors.toSet());
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-    }
-
-    public String generateAccessToken(UserJPA user) {
-
-        return Jwts.builder()
-                .setSubject(String.format("%s", user.getUsername()))
-                .setIssuer("CodeJava")
-                .claim("roles", getUserRole(user.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
     }
 
     public void registerUser(String name, String surname, String username, String email, String password, String phone_number, String city) {
@@ -261,8 +253,6 @@ public class UserService implements UserDetailsService {
                 Pair<String, String> documentAndInstitutionLocation = new Pair<>(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
                 documentsAndInstitutionLocations.add(documentAndInstitutionLocation);
             }
-
-
             return documentsAndInstitutionLocations;
         }
         catch(NoSuchElementException e)
