@@ -14,6 +14,7 @@ public class DocumentImageJPA {
     @Lob
     @Column(name = "image")
     private byte[] image;
+    private int id_user;
 
     public int getId() {
         return id;
@@ -45,5 +46,13 @@ public class DocumentImageJPA {
 
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public int getId_user() {
+        return id_user;
+    }
+
+    public void setId_user(int id_user) {
+        this.id_user = id_user;
     }
 }

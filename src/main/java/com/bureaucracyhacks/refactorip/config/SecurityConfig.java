@@ -1,5 +1,6 @@
 package com.bureaucracyhacks.refactorip.config;
 
+
 import com.bureaucracyhacks.refactorip.filters.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-
     private final AuthenticationProvider authenticationProvider;
+
 
 
     @Bean
@@ -43,6 +44,7 @@ public class SecurityConfig {
                             throw new RuntimeException(e);
                         }
                     }
+
 
             );
         return http.build();

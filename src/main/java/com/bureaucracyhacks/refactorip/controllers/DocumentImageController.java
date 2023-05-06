@@ -1,5 +1,9 @@
 package com.bureaucracyhacks.refactorip.controllers;
 
+import com.bureaucracyhacks.refactorip.exceptions.ImageDimensionException;
+import com.bureaucracyhacks.refactorip.exceptions.ImageFormatException;
+import com.bureaucracyhacks.refactorip.exceptions.ImageNotFoundException;
+import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import com.bureaucracyhacks.refactorip.services.DocumentImageService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +23,41 @@ public class DocumentImageController {
 
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/upload")
-    public void uploadImage(@RequestParam("image")MultipartFile file) throws IOException {
-        documentImageService.uploadImage(file);
+    public ResponseEntity<?> uploadImage(@RequestParam("image")MultipartFile file, int id_user) throws IOException {
+
+        try{
+        documentImageService.uploadImage(file, id_user);
+        } catch (ImageFormatException e)
+        {
+            return new ResponseEntity<>("Invalid format! Try JPG, JPEG OR PNG!", HttpStatus.BAD_REQUEST);
+        }
+        catch (ImageDimensionException e)
+        {
+            return new ResponseEntity<>("Invalid dimensions, maximum size is 10MB!", HttpStatus.BAD_REQUEST);
+        }
+        catch (UserNotFoundException e)
+        {
+            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("Image uploaded successfully!", HttpStatus.OK);
     }
 
     @GetMapping("/download/{imageName}")
-    public ResponseEntity<byte[]> downloadImage(@PathVariable String imageName) {
-        byte[] image = documentImageService.downloadImage(imageName);
+    public ResponseEntity<?> downloadImage(@PathVariable String imageName, int id_user) {
+
+        byte[] image;
+        try {
+            image = documentImageService.downloadImage(imageName, id_user);
+        }
+        catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }
+        catch (ImageNotFoundException e)
+        {
+            return new ResponseEntity<>("Image not found!", HttpStatus.BAD_REQUEST);
+        }
+
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image);
     }
 }

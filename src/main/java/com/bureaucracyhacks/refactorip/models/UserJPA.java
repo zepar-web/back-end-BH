@@ -3,7 +3,6 @@ package com.bureaucracyhacks.refactorip.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Collection;
 import java.util.Set;
 
 @Data
@@ -49,4 +48,5 @@ public class UserJPA {
     public void addDocument(DocumentJPA document) {
         documents.add(document);
     }
+
 }
