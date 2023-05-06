@@ -1,6 +1,11 @@
 package com.bureaucracyhacks.refactorip.services;
 
-import com.bureaucracyhacks.refactorip.models.RoleJPA;
+import com.bureaucracyhacks.refactorip.exceptions.TaskNotFoundException;
+import com.bureaucracyhacks.refactorip.models.*;
+import com.bureaucracyhacks.refactorip.repositories.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import kotlin.Pair;
 import org.apache.commons.validator.routines.EmailValidator;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -9,11 +14,6 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
-import com.bureaucracyhacks.refactorip.models.DocumentJPA;
-import com.bureaucracyhacks.refactorip.models.UserJPA;
-import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
-import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
-import com.bureaucracyhacks.refactorip.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,10 +48,23 @@ public class UserService implements UserDetailsService {
     @Autowired
     private DocumentRepository documentRepository;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, DocumentRepository documentRepository) {
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private InstitutionRepository institutionRepository;
+
+
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       DocumentRepository documentRepository,
+                       TaskRepository taskRepository,
+                       InstitutionRepository institutionRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.documentRepository = documentRepository;
+        this.taskRepository = taskRepository;
+        this.institutionRepository = institutionRepository;
     }
 
 
@@ -61,10 +74,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
 
         Set<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole_id() == 0 ? "USER" : "ADMIN"))
+                .map(role -> new SimpleGrantedAuthority(role.getRole_id() == 2 ? "USER" : "ADMIN"))
                 .collect(Collectors.toSet());
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 
     public void registerUser(String name, String surname, String username, String email, String password, String phone_number, String city) {
@@ -211,4 +224,27 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
+    public HashMap<String, String> generateTodoList(String taskName){
+        try {
+            TaskJPA task = taskRepository.findByName(taskName).orElseThrow();
+
+            List<DocumentJPA> documents = task.getDocuments();
+
+            //List<Pair<String, String>> documentsAndInstitutionLocations = new ArrayList<>();
+
+            HashMap<String, String> documentsAndInstitutionLocations = new HashMap<>();
+
+            for (DocumentJPA document : documents) {
+                //Pair<String, String> documentAndInstitutionLocation = new Pair<>(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
+                //documentsAndInstitutionLocations.add(documentAndInstitutionLocation);
+                documentsAndInstitutionLocations.put(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
+            }
+            return documentsAndInstitutionLocations;
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new TaskNotFoundException();
+        }
+
+    }
 }

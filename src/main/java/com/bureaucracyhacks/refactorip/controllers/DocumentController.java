@@ -25,7 +25,6 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
-
        @PostMapping("/findByName")
         public ResponseEntity<?> findByName(@RequestParam String name) {
 

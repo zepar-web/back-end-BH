@@ -2,6 +2,7 @@ package com.bureaucracyhacks.refactorip.controllers;
 
 import com.bureaucracyhacks.refactorip.services.AdminService;
 import com.bureaucracyhacks.refactorip.services.UserService;
+import jakarta.annotation.security.DeclareRoles;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasAuthority('ADMIN')")
 public class AdminController {
     @Autowired
     private UserService userService;
@@ -20,6 +20,7 @@ public class AdminController {
     private AdminService adminService;
     
     @PostMapping("/make-admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> makeAdmin(@RequestParam String username) {
         System.out.println("User is now an admin");
         if (userService.isUsernameTaken(username)) {
@@ -32,6 +33,7 @@ public class AdminController {
         }
     }
     @PostMapping("/remove-admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> removeAdmin(@RequestParam String username) {
         System.out.println("User is no longer an admin");
         if (userService.isUsernameTaken(username)) {
