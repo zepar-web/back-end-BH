@@ -36,6 +36,7 @@ public class SecurityConfig {
                                         .requestMatchers("/api/doc/**").authenticated()
                                         .requestMatchers("/api/image/**").authenticated()
                                         .requestMatchers("/api/institutions/**").authenticated()
+                                        .requestMatchers("/api/tasks/**").authenticated()
                                             .anyRequest().authenticated()
                                     .and()
                                     .sessionManagement()
