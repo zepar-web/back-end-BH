@@ -6,6 +6,8 @@ import com.bureaucracyhacks.refactorip.repositories.*;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import kotlin.Pair;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.validator.routines.EmailValidator;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -17,6 +19,7 @@ import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,47 +29,25 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private DocumentRepository documentRepository;
+    private final DocumentRepository documentRepository;
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    @Autowired
-    private InstitutionRepository institutionRepository;
-
-
-    public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       DocumentRepository documentRepository,
-                       TaskRepository taskRepository,
-                       InstitutionRepository institutionRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.documentRepository = documentRepository;
-        this.taskRepository = taskRepository;
-        this.institutionRepository = institutionRepository;
-    }
-
+    private final InstitutionRepository institutionRepository;
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -93,9 +74,9 @@ public class UserService implements UserDetailsService {
         user.setCity(city);
         user.setRoles(Collections.singleton(role));
 
-        String text = "2011-10-02 18:48:05.123456";
-        Timestamp ts = Timestamp.valueOf(text);
-        user.setCreated_at(ts.toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date now = new Date();
+        user.setCreated_at(sdf.format(now));
 
         userRepository.save(user);
     }
@@ -152,13 +133,6 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
-    public boolean isAdmin(String usernameOrEmail) {
-        UserJPA user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail));
-
-        return user.getRoles().stream().anyMatch(role -> role.getRole_id() == 1L);
-    }
-
     public void addDocument(String username, String documentName) {
         UserJPA user;
         try {
@@ -178,7 +152,7 @@ public class UserService implements UserDetailsService {
             throw new DocumentNotFoundException();
         }
 
-        user.getDocuments().add(document);
+        user.addDocument(document);
 
         userRepository.save(user);
     }
@@ -207,7 +181,7 @@ public class UserService implements UserDetailsService {
         PhoneNumberUtil numberUtil = PhoneNumberUtil.getInstance();
         PhoneNumber phoneNumber;
         try {
-           phoneNumber = numberUtil.parse(phone_number, "RO");
+            phoneNumber = numberUtil.parse(phone_number, "RO");
         } catch (NumberParseException e) {
             return false;
         }
@@ -230,13 +204,9 @@ public class UserService implements UserDetailsService {
 
             List<DocumentJPA> documents = task.getDocuments();
 
-            //List<Pair<String, String>> documentsAndInstitutionLocations = new ArrayList<>();
-
             HashMap<String, String> documentsAndInstitutionLocations = new HashMap<>();
 
             for (DocumentJPA document : documents) {
-                //Pair<String, String> documentAndInstitutionLocation = new Pair<>(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
-                //documentsAndInstitutionLocations.add(documentAndInstitutionLocation);
                 documentsAndInstitutionLocations.put(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
             }
             return documentsAndInstitutionLocations;
@@ -245,6 +215,5 @@ public class UserService implements UserDetailsService {
         {
             throw new TaskNotFoundException();
         }
-
     }
 }

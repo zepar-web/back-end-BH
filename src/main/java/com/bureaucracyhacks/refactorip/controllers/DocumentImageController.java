@@ -5,6 +5,7 @@ import com.bureaucracyhacks.refactorip.exceptions.ImageFormatException;
 import com.bureaucracyhacks.refactorip.exceptions.ImageNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import com.bureaucracyhacks.refactorip.services.DocumentImageService;
+import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/image")
 public class DocumentImageController {
-    @Autowired
-    private DocumentImageService documentImageService;
+
+    private final DocumentImageService documentImageService;
 
     @ResponseStatus(value = HttpStatus.OK)
     @PostMapping("/upload")

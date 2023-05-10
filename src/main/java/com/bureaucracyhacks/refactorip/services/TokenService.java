@@ -24,6 +24,7 @@ public class TokenService {
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
+
     public String extractRole(String jwtToken) {
         return extractClaim(jwtToken, claims -> claims.get("roles", String.class));
     }
@@ -36,7 +37,6 @@ public class TokenService {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuer("bureaucracyhacks.com")
                 .claim("roles", userDetails.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")) ? "ROLE_ADMIN" : "ROLE_USER")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))
@@ -69,6 +69,20 @@ public class TokenService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    //refresh token
+    public String refreshToken(String token) {
+        final Claims claims = extractAllClaims(token);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+    public Date extractExpirationDate(String token) {
+        return extractExpiration(token);
     }
 
 }

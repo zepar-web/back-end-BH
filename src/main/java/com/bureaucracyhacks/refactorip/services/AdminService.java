@@ -5,26 +5,22 @@ import com.bureaucracyhacks.refactorip.models.RoleJPA;
 import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
+import jakarta.annotation.Resource;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 @Service
+@RequiredArgsConstructor
 public class AdminService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    public AdminService(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
-
-    public void makeAdmin(String name)
-    {
+    public void makeAdmin(String name) {
         UserJPA user;
         try {
             user = userRepository.findByUsername(name).orElseThrow();
@@ -38,8 +34,7 @@ public class AdminService {
         userRepository.save(user);
     }
 
-    public void removeAdmin(String username)
-    {
+    public void removeAdmin(String username) {
         UserJPA user;
         try {
             user = userRepository.findByUsername(username).orElseThrow();

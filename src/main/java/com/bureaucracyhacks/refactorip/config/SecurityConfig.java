@@ -31,8 +31,10 @@ public class SecurityConfig {
                         try {
                             authorize
                                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                                    .requestMatchers(HttpMethod.POST, "/api/user-service/**").authenticated()
                                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                                        .requestMatchers("/api/doc/**").permitAll()
+                                        .requestMatchers("/api/doc/**").authenticated()
+                                        .requestMatchers("/api/image/**").authenticated()
                                             .anyRequest().authenticated()
                                     .and()
                                     .sessionManagement()
@@ -49,6 +51,5 @@ public class SecurityConfig {
             );
         return http.build();
     }
-
 
 }

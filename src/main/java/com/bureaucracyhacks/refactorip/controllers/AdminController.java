@@ -4,20 +4,20 @@ import com.bureaucracyhacks.refactorip.services.AdminService;
 import com.bureaucracyhacks.refactorip.services.UserService;
 import jakarta.annotation.security.DeclareRoles;
 import jakarta.annotation.security.RolesAllowed;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private AdminService adminService;
+    private final UserService userService;
+
+    private final AdminService adminService;
     
     @PostMapping("/make-admin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
