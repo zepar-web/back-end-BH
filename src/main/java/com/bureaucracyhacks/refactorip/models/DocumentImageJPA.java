@@ -16,5 +16,6 @@ public class DocumentImageJPA {
     @Lob
     @Column(name = "image")
     private byte[] image;
+    private int id_user;
 
 }

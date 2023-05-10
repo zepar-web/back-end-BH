@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.model.GeocodingResult;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class DirectionService
 {
-   //TODO define autowired dependencies for UserTasks , Tasks etc
+    //TODO define autowired dependencies for UserTasks , Tasks etc
 
     public DirectionService()
     {
@@ -32,9 +33,17 @@ public class DirectionService
 
     public boolean getDirections() throws IOException
     {
+
+        //get the api from the .env file
+        Dotenv dotenv = Dotenv.configure().filename("configure.env").ignoreIfMalformed().ignoreIfMissing().load();
+
+        String api_key = dotenv.get("API_KEY_MAPS");
+
+
+
         //TODO make a call to DirectionsService
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey("AIzaSyA3oREFzGR_MXeZgmuBT43oqv9atQroWXQ")
+                .apiKey(api_key)
                 .build();
         //list to store the waypoints
 
@@ -61,16 +70,17 @@ public class DirectionService
         StringBuilder url = new StringBuilder("https://maps.googleapis.com/maps/api/directions/json?language=ro&origin=");
         url.append(waypoints.get(0)[0].geometry.location); //add the origin as the first waypoint
         url.append("&destination=").append(waypoints.get(waypoints.size() - 1)[0].geometry.location); //add the destination as the last waypoint
-        url.append("&mode=walking&key=").append("AIzaSyA3oREFzGR_MXeZgmuBT43oqv9atQroWXQ");
+        url.append("&mode=walking&key=").append(api_key);
 
         //add the waypoints in between if there are any
         if (waypoints.size() > 2)
         {
-            url.append("&waypoints="); //optimize the waypoints
+
+            url.append("&waypoints=optimize:true"); //optimize the waypoints
 
             for (int i = 1; i < waypoints.size() - 1; i++)
             {
-                url.append("via:").append(waypoints.get(i)[0].geometry.location);
+                url.append(waypoints.get(i)[0].geometry.location);
                 if (i != waypoints.size() - 2)
                 {
                     url.append("|");
@@ -105,6 +115,7 @@ public class DirectionService
         }
         //System.out.println(content);
         in.close();
+
         //deserializing the response
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Root root = gson.fromJson(String.valueOf(content), Root.class);
