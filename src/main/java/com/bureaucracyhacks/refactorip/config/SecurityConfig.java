@@ -35,6 +35,7 @@ public class SecurityConfig {
                                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                         .requestMatchers("/api/doc/**").authenticated()
                                         .requestMatchers("/api/image/**").authenticated()
+                                        .requestMatchers("/api/institutions/**").authenticated()
                                             .anyRequest().authenticated()
                                     .and()
                                     .sessionManagement()
