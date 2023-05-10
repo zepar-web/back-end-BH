@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,9 +34,9 @@ public class ReviewService {
         reviewJPA.setRating(rating);
         reviewJPA.setUser_id(user_id);
         reviewJPA.setInstitution_id(institution_id);
-        String text = "2011-10-02 18:48:05.123456";
-        Timestamp ts = Timestamp.valueOf(text);
-        reviewJPA.setCreated_at(ts.toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date now = new Date();
+        reviewJPA.setCreated_at(sdf.format(now));
 
         reviewRepository.save(reviewJPA);
     }

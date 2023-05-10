@@ -16,7 +16,10 @@ public class DocumentJPA {
     private int document_id;
     private String name;
     private String description;
-    private double price;
+    private String price;
     private int institution_id;
     private String path;
+    @Lob
+    @Column(name="file")
+    private byte[] file;
 }
