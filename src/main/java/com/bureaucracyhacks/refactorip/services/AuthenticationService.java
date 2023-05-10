@@ -4,6 +4,7 @@ import com.bureaucracyhacks.refactorip.controllers.AuthenticationResponse;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
 import japa.parser.Token;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
@@ -21,7 +22,6 @@ public class AuthenticationService {
 
     private final TokenService tokenService;
 
-    private final UserService userService;
     public AuthenticationResponse authenticateUser(String usernameOrEmail, String password) {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(usernameOrEmail, password));

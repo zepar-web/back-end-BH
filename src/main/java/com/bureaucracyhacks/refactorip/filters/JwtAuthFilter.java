@@ -22,8 +22,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
 
     private final TokenService tokenService;
 
@@ -33,6 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String jwtToken;
         final String username;
         final String role;
+        final String refreshToken;
 
        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
            filterChain.doFilter(request, response);
@@ -41,6 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
        jwtToken = authHeader.substring(7);
        username = tokenService.extractUsername(jwtToken);
+        System.out.println(tokenService.extractExpirationDate(jwtToken));
          role = tokenService.extractRole(jwtToken);
        log.info("JWT Token: " + jwtToken);
          log.info("Username: " + username);
@@ -48,7 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
            UserDetails userDetails = this.userService.loadUserByUsername(username);
-           //response.setHeader("Authorization", "Bearer " + jwtToken);
+           response.setHeader("Authorization", "Bearer " + jwtToken);
 
            if(tokenService.isTokenValid(jwtToken, userDetails)){
               UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -57,6 +59,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 log.info("User is now authenticated");
            }
        }
+       refreshToken = tokenService.refreshToken(jwtToken);
+        System.out.println(tokenService.extractExpirationDate(refreshToken));
+       response.setHeader("Authorization", "Bearer " + refreshToken);
          filterChain.doFilter(request, response);
     }
 }
