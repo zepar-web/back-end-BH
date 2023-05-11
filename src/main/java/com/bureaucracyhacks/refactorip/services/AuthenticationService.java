@@ -1,6 +1,8 @@
 package com.bureaucracyhacks.refactorip.services;
 
 import com.bureaucracyhacks.refactorip.controllers.AuthenticationResponse;
+import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
+import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
 import japa.parser.Token;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,16 @@ public class AuthenticationService {
 
         var jwtToken = tokenService.generateToken(user);
 
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        UserJPA userjpa = new UserJPA();
+
+        userjpa.setName(user.getName());
+        userjpa.setSurname(user.getSurname());
+        userjpa.setUsername(user.getUsername());
+        userjpa.setEmail(user.getEmail());
+        userjpa.setCity(user.getCity());
+        userjpa.setPhone_number(user.getPhone_number());
+
+        return AuthenticationResponse.builder().token(jwtToken).user(userjpa).build();
     }
 
 }
