@@ -1,6 +1,5 @@
 package com.bureaucracyhacks.refactorip.config;
 
-
 import com.bureaucracyhacks.refactorip.filters.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +20,9 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf().disable().cors().and()
             .authorizeHttpRequests((authorize) ->
                     {
                         try {
@@ -49,8 +46,6 @@ public class SecurityConfig {
                             throw new RuntimeException(e);
                         }
                     }
-
-
             );
         return http.build();
     }

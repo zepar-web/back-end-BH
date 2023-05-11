@@ -61,7 +61,7 @@ public class UserController {
         return new ResponseEntity<>("Document added successfully!", HttpStatus.OK);
     }
 
-    @PostMapping("/todo-list")
+    @GetMapping("/todo-list")
     public ResponseEntity<?> generateTodoList(@RequestParam String userTaskName) {
         HashMap<String, String> documentsAndInstitutionLocation;
         try {
