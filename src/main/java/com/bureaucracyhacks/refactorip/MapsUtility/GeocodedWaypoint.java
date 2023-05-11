@@ -1,7 +1,9 @@
 package com.bureaucracyhacks.refactorip.MapsUtility;
 
-import java.util.ArrayList;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+@Component
 public class GeocodedWaypoint
 {
     public String geocoder_status;

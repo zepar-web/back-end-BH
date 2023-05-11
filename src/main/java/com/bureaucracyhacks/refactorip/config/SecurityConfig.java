@@ -1,6 +1,5 @@
 package com.bureaucracyhacks.refactorip.config;
 
-
 import com.bureaucracyhacks.refactorip.filters.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +32,9 @@ public class SecurityConfig {
                                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                         .requestMatchers("/api/doc/**").authenticated()
                                         .requestMatchers("/api/image/**").authenticated()
-                                        .requestMatchers(HttpMethod.GET,"/api/institutions/**").authenticated()
-                                        .requestMatchers(HttpMethod.GET,"/api/tasks/**").authenticated()
+                                        .requestMatchers("/api/institutions/**").authenticated()
+                                        .requestMatchers("/api/tasks/**").authenticated()
+                                        .requestMatchers("/api/directions").authenticated()
                                             .anyRequest().authenticated()
                                     .and()
                                     .sessionManagement()

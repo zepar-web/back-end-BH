@@ -6,6 +6,7 @@ import com.bureaucracyhacks.refactorip.models.TaskJPA;
 import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
 import com.bureaucracyhacks.refactorip.repositories.TaskRepository;
 import com.bureaucracyhacks.refactorip.utils.ImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;

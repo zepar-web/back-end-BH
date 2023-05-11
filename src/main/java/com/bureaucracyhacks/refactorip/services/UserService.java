@@ -1,25 +1,20 @@
 package com.bureaucracyhacks.refactorip.services;
 
+import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.TaskNotFoundException;
-import com.bureaucracyhacks.refactorip.models.*;
+import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
+import com.bureaucracyhacks.refactorip.models.DocumentJPA;
+import com.bureaucracyhacks.refactorip.models.RoleJPA;
+import com.bureaucracyhacks.refactorip.models.TaskJPA;
+import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.*;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import kotlin.Pair;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.validator.routines.EmailValidator;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-
-
-import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
-import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
