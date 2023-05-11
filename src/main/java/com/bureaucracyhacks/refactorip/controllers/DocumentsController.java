@@ -6,7 +6,6 @@ import com.bureaucracyhacks.refactorip.models.TaskJPA;
 import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
 import com.bureaucracyhacks.refactorip.repositories.TaskRepository;
 import com.bureaucracyhacks.refactorip.utils.ImageUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,9 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +28,9 @@ public class DocumentsController {
     private final DocumentRepository documentRepository;
     private final TaskRepository taskRepository;
 
+
     @GetMapping("/{taskId}/documents")
     public ResponseEntity<List<DocumentJPA>> getDocumentsForTask(@PathVariable Long taskId) throws IOException {
-
         TaskJPA task = taskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
 
@@ -107,9 +103,11 @@ public class DocumentsController {
     }
 
     @GetMapping("/find-by-name/{name}")
-    public TaskJPA GetTaskByName(@PathVariable String name){
-        return taskRepository.findByName(name)
+    public List<DocumentJPA> GetTaskByName(@PathVariable String name){
+        TaskJPA task = taskRepository.findByName(name)
                 .orElseThrow(TaskNotFoundException::new);
+
+        return task.getDocuments();
     }
 
     @GetMapping("/names")
