@@ -21,11 +21,9 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf().disable().cors().and()
             .authorizeHttpRequests((authorize) ->
                     {
                         try {
@@ -35,8 +33,8 @@ public class SecurityConfig {
                                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                         .requestMatchers("/api/doc/**").authenticated()
                                         .requestMatchers("/api/image/**").authenticated()
-                                        .requestMatchers("/api/institutions/**").authenticated()
-                                        .requestMatchers("/api/tasks/**").authenticated()
+                                        .requestMatchers(HttpMethod.GET,"/api/institutions/**").authenticated()
+                                        .requestMatchers(HttpMethod.GET,"/api/tasks/**").authenticated()
                                             .anyRequest().authenticated()
                                     .and()
                                     .sessionManagement()
@@ -48,8 +46,6 @@ public class SecurityConfig {
                             throw new RuntimeException(e);
                         }
                     }
-
-
             );
         return http.build();
     }

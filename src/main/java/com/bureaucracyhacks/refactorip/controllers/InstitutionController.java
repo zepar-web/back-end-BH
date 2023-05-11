@@ -15,7 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/institutions")
 public class InstitutionController {
-    private InstitutionRepository institutionRepository;
+    private final InstitutionRepository institutionRepository;
 
     @GetMapping("/{name}")
     public InstitutionJPA getInstitutionByName(@PathVariable String name) {
