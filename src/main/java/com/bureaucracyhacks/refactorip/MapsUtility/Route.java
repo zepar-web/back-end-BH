@@ -1,9 +1,10 @@
 package com.bureaucracyhacks.refactorip.MapsUtility;
 
 import com.google.maps.model.Bounds;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-
+@Component
 public class Route
 {
     public Bounds bounds;

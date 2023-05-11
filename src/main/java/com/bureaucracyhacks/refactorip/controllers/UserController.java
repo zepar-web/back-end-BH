@@ -3,32 +3,17 @@ package com.bureaucracyhacks.refactorip.controllers;
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.TaskNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
-import com.bureaucracyhacks.refactorip.models.DocumentJPA;
-import com.bureaucracyhacks.refactorip.models.RoleJPA;
-import com.bureaucracyhacks.refactorip.models.UserJPA;
-import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.services.AuthenticationService;
-import com.bureaucracyhacks.refactorip.services.TokenService;
 import com.bureaucracyhacks.refactorip.services.UserService;
-import kotlin.Pair;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user-service")

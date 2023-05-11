@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,9 +43,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
        username = tokenService.extractUsername(jwtToken);
         System.out.println(tokenService.extractExpirationDate(jwtToken));
          role = tokenService.extractRole(jwtToken);
-       log.info("JWT Token: " + jwtToken);
-         log.info("Username: " + username);
-            log.info("Role: " + role);
+
+//       log.info("JWT Token: " + jwtToken);
+//         log.info("Username: " + username);
+//            log.info("Role: " + role);
 
        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
            UserDetails userDetails = this.userService.loadUserByUsername(username);
@@ -56,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
               UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                log.info("User is now authenticated");
+                //log.info("User is now authenticated");
            }
        }
        refreshToken = tokenService.refreshToken(jwtToken);
