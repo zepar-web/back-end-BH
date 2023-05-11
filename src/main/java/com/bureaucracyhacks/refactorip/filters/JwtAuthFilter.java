@@ -62,7 +62,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
        refreshToken = tokenService.refreshToken(jwtToken);
         System.out.println(tokenService.extractExpirationDate(refreshToken));
        response.setHeader("Authorization", "Bearer " + refreshToken);
-       response.setHeader("Access-Control-Allow-Origin", "*");
          filterChain.doFilter(request, response);
     }
 }
