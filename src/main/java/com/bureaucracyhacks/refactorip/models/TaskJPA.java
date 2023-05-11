@@ -16,7 +16,8 @@ public class TaskJPA
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int task_id;
+    @Column(name="task_id")
+    private Long id;
     private String name;
     private String description;
     private String estimated_time;
