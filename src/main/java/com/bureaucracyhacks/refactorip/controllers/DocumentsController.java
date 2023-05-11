@@ -98,4 +98,22 @@ public class DocumentsController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + ".png\"")
                 .body(new ByteArrayResource(decompressedFile));
     }
+
+    @GetMapping("/tasks/{id}")
+    public ResponseEntity<TaskJPA> getTaskById(@PathVariable(value = "id") Long taskId){
+        TaskJPA task = taskRepository.findById(taskId)
+                .orElseThrow(TaskNotFoundException::new);
+        return ResponseEntity.ok().body(task);
+    }
+
+    @GetMapping("/{name}")
+    public TaskJPA GetTaskByName(@PathVariable String name){
+        return taskRepository.findByName(name)
+                .orElseThrow(TaskNotFoundException::new);
+    }
+
+    @GetMapping("/names")
+    public List<String> getAllTaskNames(){
+        return taskRepository.findAll().stream().map(TaskJPA::getName).toList();
+    }
 }
