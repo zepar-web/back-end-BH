@@ -49,6 +49,29 @@ public class UserController {
         return new ResponseEntity<>("User deleted successfully!", HttpStatus.OK);
     }
 
+    @PostMapping("/verifyPassword")
+    public ResponseEntity<?> verifyPassword(@RequestParam String username, @RequestParam String password) {
+        System.out.println("verifyPassword");
+        try {
+            if (userService.verifyPassword(username, password)) {
+                return new ResponseEntity<>("Password is valid!", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Password is not valid!", HttpStatus.OK);
+            }
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found!", HttpStatus.OK);
+        }
+    }
+    @PostMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestParam String username, @RequestParam String password) {
+        System.out.println("updatePassword");
+        try {
+            userService.updatePassword(username, password);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Password updated successfully!", HttpStatus.OK);
+    }
     @PostMapping("/addDocument")
     public ResponseEntity<?> addDocument(@RequestParam String username, @RequestParam String documentName) {
 

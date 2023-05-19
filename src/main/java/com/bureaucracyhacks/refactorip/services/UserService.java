@@ -83,6 +83,34 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).isPresent();
     }
 
+
+    public boolean verifyPassword(String username, String password) {
+        UserJPA user;
+
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new UserNotFoundException();
+        }
+
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    public void updatePassword(String username, String password) {
+        UserJPA user;
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new UserNotFoundException();
+        }
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
     public void updateUser(String username, String email, String phone_number, String password, String name, String surname, String city) {
         UserJPA user;
         try {
