@@ -3,10 +3,7 @@ package com.bureaucracyhacks.refactorip.services;
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.TaskNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
-import com.bureaucracyhacks.refactorip.models.DocumentJPA;
-import com.bureaucracyhacks.refactorip.models.RoleJPA;
-import com.bureaucracyhacks.refactorip.models.TaskJPA;
-import com.bureaucracyhacks.refactorip.models.UserJPA;
+import com.bureaucracyhacks.refactorip.models.*;
 import com.bureaucracyhacks.refactorip.repositories.*;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -43,6 +40,8 @@ public class UserService implements UserDetailsService {
     private final TaskRepository taskRepository;
 
     private final InstitutionRepository institutionRepository;
+
+    private final UserDocumentsRepository userDocumentsRepository;
 
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
@@ -147,7 +146,7 @@ public class UserService implements UserDetailsService {
             throw new DocumentNotFoundException();
         }
 
-        user.addDocument(document);
+        user.getDocuments().add(document);
 
         userRepository.save(user);
     }
@@ -193,22 +192,76 @@ public class UserService implements UserDetailsService {
         return false;
     }
 
-    public HashMap<String, String> generateTodoList(String taskName){
+    public List<Map<String, String>> generateTodoList(String taskName, String username) {
         try {
+
+            UserJPA user = userRepository.findByUsername(username).orElseThrow();
+
             TaskJPA task = taskRepository.findByName(taskName).orElseThrow();
-
-            List<DocumentJPA> documents = task.getDocuments();
-
-            HashMap<String, String> documentsAndInstitutionLocations = new HashMap<>();
-
-            for (DocumentJPA document : documents) {
-                documentsAndInstitutionLocations.put(document.getName(), institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
+            //hashset of documents that are assigned to the user and the task
+            //using a hashset to avoid duplicates
+            Set<DocumentJPA> documents = new HashSet<>();
+            //looping through all the documents of the user
+            //and checking if the document is assigned to the task
+            for(DocumentJPA document : user.getDocuments())
+            {
+                //if the document is assigned to the task, add it to the hashset
+                if(document.getUserDocumentInfo().getTask_id() == task.getId()){
+                    documents.add(document);
+                }
             }
-            return documentsAndInstitutionLocations;
+
+            List<Map<String, String>> documentsAndInstitutionLocationsList = new ArrayList<>();
+
+            //looping through the documents and adding them to the list
+            for (DocumentJPA document : documents) {
+                Map<String, String> documentsAndInstitutionLocations = new HashMap<>();
+                documentsAndInstitutionLocations.put("DocName:", document.getName());
+                documentsAndInstitutionLocations.put("InstitutionLocation:", institutionRepository.findByInstitutionId((long) document.getInstitution_id()).orElseThrow().getAddress());
+                documentsAndInstitutionLocations.put("isDone:", document.getUserDocumentInfo().getStatus());
+                documentsAndInstitutionLocationsList.add(documentsAndInstitutionLocations);
+            }
+            //returning the hashmap list
+            return documentsAndInstitutionLocationsList;
         }
         catch(NoSuchElementException e)
         {
             throw new TaskNotFoundException();
         }
+    }
+
+    public void updateDocument(String documentName, String status, String username, String taskName)
+    {
+        UserJPA user;
+        TaskJPA task;
+        Set<DocumentJPA> documents;
+       try{
+            //checking if the user exists
+            user = userRepository.findByUsername(username).orElseThrow();
+            //checking if the task exists
+            task = taskRepository.findByName(taskName).orElseThrow();
+            //checking if the document exists
+            DocumentJPA userDocument = documentRepository.findByName(documentName).orElseThrow();
+            //getting the documents of the user
+            documents = user.getDocuments();
+
+            //looping through the documents of the user
+            for(DocumentJPA document : documents)
+            {
+                //if the document is assigned to the requested task and belongs to the user
+                if(document.getDocument_id() == userDocument.getDocument_id() && document.getUserDocumentInfo().getTask_id() == task.getId())
+                {
+                    //update the status of the document
+                    document.getUserDocumentInfo().setStatus(status);
+                    //save the document
+                    userDocumentsRepository.save(document.getUserDocumentInfo());
+                    break;
+                }
+            }
+       }catch (NoSuchElementException e)
+       {
+           throw new TaskNotFoundException();
+       }
+
     }
 }
