@@ -28,9 +28,9 @@ public class DocumentsController {
     private final DocumentRepository documentRepository;
     private final TaskRepository taskRepository;
 
+
     @GetMapping("/{taskId}/documents")
     public ResponseEntity<List<DocumentJPA>> getDocumentsForTask(@PathVariable Long taskId) throws IOException {
-
         TaskJPA task = taskRepository.findById(taskId)
                 .orElseThrow(TaskNotFoundException::new);
 
@@ -103,9 +103,11 @@ public class DocumentsController {
     }
 
     @GetMapping("/find-by-name/{name}")
-    public TaskJPA GetTaskByName(@PathVariable String name){
-        return taskRepository.findByName(name)
+    public List<DocumentJPA> GetTaskByName(@PathVariable String name){
+        TaskJPA task = taskRepository.findByName(name)
                 .orElseThrow(TaskNotFoundException::new);
+
+        return task.getDocuments();
     }
 
     @GetMapping("/names")

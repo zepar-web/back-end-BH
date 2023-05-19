@@ -4,12 +4,10 @@ import com.bureaucracyhacks.refactorip.MapsUtility.Direction;
 import com.bureaucracyhacks.refactorip.services.DirectionService;
 import com.google.gson.Gson;
 import com.google.maps.model.GeocodingResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +16,7 @@ import java.util.List;
 /**
  * This class contains the endpoints for the directions API
  */
+@RequiredArgsConstructor
 @RequestMapping("/api/directions")
 @RestController
 public class DirectionsController
@@ -28,13 +27,12 @@ public class DirectionsController
      *
      * @return the directions for a given route
      */
-    @Autowired
-    private DirectionService directionService;
+    private final DirectionService directionService;
 
 //    @Autowired
 //    private Root root;
 
-    @GetMapping("/get-directions")
+    @PostMapping("/get-directions")
     public ResponseEntity<String> getDirections(@RequestBody String routes) throws IOException
     {
         //System.out.println(routes);
@@ -55,36 +53,6 @@ public class DirectionsController
         //System.out.println(directions);
         //return the response as a JSON
         return ResponseEntity.ok(json);
-
-        //root = directionService.getDirections(waypoints);
-
-//        for (String Waypoint : waypoints)
-//        {
-//            System.out.println(Waypoint);
-//        }
-//        StringBuilder directions = null;
-//        for (Route route : root.routes)
-//        {
-//            for (Leg leg : route.legs)
-//            {
-//                directions = new StringBuilder();
-//                for (Step step : leg.steps)
-//                {
-//                    try
-//                    {
-//                        // System.out.println(step.html_instructions);
-//                        //directions.append(step.polyline.toString());
-//                        //System.out.println(step.polyline.toString());
-//                    } catch (NullPointerException e)
-//                    {
-//                        System.out.println("No directions found!");
-//                    }
-//                }
-//
-//            }
-//        }
-//        //just for testing purposes
-       // return ResponseEntity.ok(coords.toString());
 
     }
 }

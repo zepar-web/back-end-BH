@@ -1,6 +1,5 @@
 package com.bureaucracyhacks.refactorip.config;
 
-
 import com.bureaucracyhacks.refactorip.filters.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,24 +20,22 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf().disable().cors().and()
             .authorizeHttpRequests((authorize) ->
                     {
                         try {
                             authorize
                                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                                    .requestMatchers(HttpMethod.POST, "/api/user-service/**").authenticated()
+                                    .requestMatchers("/api/user-service/**").permitAll()
                                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                                        .requestMatchers("/api/doc/**").authenticated()
-                                        .requestMatchers("/api/image/**").authenticated()
-                                        .requestMatchers("/api/institutions/**").authenticated()
-                                        .requestMatchers("/api/tasks/**").authenticated()
-                                        .requestMatchers("/api/directions").authenticated()
-                                            .anyRequest().authenticated()
+                                        .requestMatchers("/api/doc/**").permitAll()
+                                        .requestMatchers("/api/image/**").permitAll()
+                                        .requestMatchers("/api/institutions/**").permitAll()
+                                        .requestMatchers("/api/tasks/**").permitAll()
+                                        .requestMatchers("/api/directions").permitAll()
+                                            .anyRequest().permitAll()
                                     .and()
                                     .sessionManagement()
                                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -49,8 +46,6 @@ public class SecurityConfig {
                             throw new RuntimeException(e);
                         }
                     }
-
-
             );
         return http.build();
     }
