@@ -46,6 +46,18 @@ public class UserJPA {
     )
     private Set<DocumentJPA> documents;
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_documents",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = {
+                    @JoinColumn(name = "groupID", referencedColumnName = "groupID"),
+                    @JoinColumn(name = "document_id", referencedColumnName = "document_id"),
+                    @JoinColumn(name = "task_id", referencedColumnName = "task_id"),
+                    @JoinColumn(name = "status", referencedColumnName = "status")
+            }
+    )
+    private List<UserDocumentsJPA> userDocumentInfo;
+
 
     //join table for user and tasks
     //for retrieving the tasks of a specific user

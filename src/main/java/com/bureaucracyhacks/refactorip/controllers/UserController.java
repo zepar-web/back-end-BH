@@ -118,4 +118,16 @@ public class UserController {
 
         return new ResponseEntity<>("Document updated successfully!", HttpStatus.OK);
     }
+
+    @PostMapping("/add-user-task")
+    public ResponseEntity<?> addUserTask(@RequestParam String username, @RequestParam String taskName) {
+        try {
+            userService.addUserTask(username, taskName);
+            userService.addUserDocumentsFromTask(username, taskName);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("User task added successfully!", HttpStatus.OK);
+    }
+
 }

@@ -267,7 +267,7 @@ public class UserService implements UserDetailsService {
             //checking if the user exists
             user = userRepository.findByUsername(username).orElseThrow();
             //checking if the task exists
-            task = taskRepository.findByName(taskName).orElseThrow();
+            task = user.getTasks().stream().filter(t -> t.getName().equals(taskName)).findFirst().orElseThrow();
             //checking if the document exists
             DocumentJPA userDocument = documentRepository.findByName(documentName).orElseThrow();
             //getting the documents of the user
@@ -291,5 +291,47 @@ public class UserService implements UserDetailsService {
            throw new TaskNotFoundException();
        }
 
+    }
+
+    public void addUserTask(String username, String taskName) {
+        UserJPA user;
+        TaskJPA task;
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+            task = taskRepository.findByName(taskName).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new TaskNotFoundException();
+        }
+
+        user.getTasks().add(task);
+
+        userRepository.save(user);
+    }
+
+    public void addUserDocumentsFromTask(String username, String taskName) {
+        UserJPA user;
+        TaskJPA task;
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+            task = taskRepository.findByName(taskName).orElseThrow();
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new TaskNotFoundException();
+        }
+
+        for(DocumentJPA document : task.getDocuments())
+        {
+            UserDocumentsJPA userDocument = new UserDocumentsJPA();
+            userDocument.setDocument_id(document.getDocument_id());
+            userDocument.setTask_id(Math.toIntExact(task.getId()));
+            userDocument.setStatus("pending");
+            userDocument.setUser_id(Math.toIntExact(user.getUser_id()));
+            user.getUserDocumentInfo().add(userDocument);
+
+        }
+        userRepository.save(user);
     }
 }

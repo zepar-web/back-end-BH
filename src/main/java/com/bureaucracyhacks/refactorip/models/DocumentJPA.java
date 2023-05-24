@@ -28,7 +28,12 @@ public class DocumentJPA {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_documents",
             joinColumns = @JoinColumn(name = "document_id", referencedColumnName = "document_id"),
-            inverseJoinColumns = @JoinColumn(name = "status", referencedColumnName = "status")
+            inverseJoinColumns = {
+                    @JoinColumn(name = "groupID", referencedColumnName = "groupID"),
+                    @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+                    @JoinColumn(name = "task_id", referencedColumnName = "task_id"),
+                    @JoinColumn(name = "status", referencedColumnName = "status")
+            }
     )
     private UserDocumentsJPA userDocumentInfo;
 }
