@@ -5,10 +5,7 @@ import com.bureaucracyhacks.refactorip.models.RoleJPA;
 import com.bureaucracyhacks.refactorip.models.UserJPA;
 import com.bureaucracyhacks.refactorip.repositories.RoleRepository;
 import com.bureaucracyhacks.refactorip.repositories.UserRepository;
-import jakarta.annotation.Resource;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;

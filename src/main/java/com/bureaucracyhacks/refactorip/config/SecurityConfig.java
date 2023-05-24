@@ -1,6 +1,5 @@
 package com.bureaucracyhacks.refactorip.config;
 
-
 import com.bureaucracyhacks.refactorip.filters.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,13 +28,14 @@ public class SecurityConfig {
                         try {
                             authorize
                                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                                    .requestMatchers(HttpMethod.POST, "/api/user-service/**").authenticated()
+                                    .requestMatchers("/api/user-service/**").permitAll()
                                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                                        .requestMatchers("/api/doc/**").authenticated()
-                                        .requestMatchers("/api/image/**").authenticated()
-                                        .requestMatchers(HttpMethod.GET,"/api/institutions/**").authenticated()
-                                        .requestMatchers(HttpMethod.GET,"/api/tasks/**").authenticated()
-                                            .anyRequest().authenticated()
+                                        .requestMatchers("/api/doc/**").permitAll()
+                                        .requestMatchers("/api/image/**").permitAll()
+                                        .requestMatchers("/api/institutions/**").permitAll()
+                                        .requestMatchers("/api/tasks/**").permitAll()
+                                        .requestMatchers("/api/directions").permitAll()
+                                            .anyRequest().permitAll()
                                     .and()
                                     .sessionManagement()
                                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
