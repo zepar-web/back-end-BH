@@ -3,6 +3,7 @@ package com.bureaucracyhacks.refactorip.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -45,8 +46,15 @@ public class UserJPA {
     )
     private Set<DocumentJPA> documents;
 
-    public void addDocument(DocumentJPA document) {
-        documents.add(document);
-    }
+
+    //join table for user and tasks
+    //for retrieving the tasks of a specific user
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_tasks",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id", referencedColumnName = "task_id")
+    )
+    private List<TaskJPA> tasks;
+
 
 }
