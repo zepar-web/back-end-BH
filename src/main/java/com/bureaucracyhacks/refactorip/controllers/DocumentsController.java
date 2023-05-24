@@ -4,6 +4,7 @@ import com.bureaucracyhacks.refactorip.models.DocumentJPA;
 import com.bureaucracyhacks.refactorip.models.TaskJPA;
 import com.bureaucracyhacks.refactorip.repositories.DocumentRepository;
 import com.bureaucracyhacks.refactorip.repositories.TaskRepository;
+import com.bureaucracyhacks.refactorip.services.TaskService;
 import com.bureaucracyhacks.refactorip.utils.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -26,8 +27,7 @@ public class DocumentsController {
 
     private final DocumentRepository documentRepository;
     private final TaskRepository taskRepository;
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
 
     @GetMapping("/{taskId}/documents")
     public ResponseEntity<List<DocumentJPA>> getDocumentsForTask(@PathVariable Long taskId) {
