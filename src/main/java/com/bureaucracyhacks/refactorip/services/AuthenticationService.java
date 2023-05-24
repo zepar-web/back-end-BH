@@ -34,6 +34,7 @@ public class AuthenticationService {
         userjpa.setEmail(user.getEmail());
         userjpa.setCity(user.getCity());
         userjpa.setPhone_number(user.getPhone_number());
+        userjpa.setRoles(user.getRoles());
 
         return AuthenticationResponse.builder().token(jwtToken).user(userjpa).build();
     }

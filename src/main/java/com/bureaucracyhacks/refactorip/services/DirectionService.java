@@ -32,7 +32,7 @@ public class DirectionService
         Dotenv dotenv = null;
         dotenv = Dotenv.configure().filename("config.env").load();
         String API_KEY = dotenv.get("API_KEY_MAPS");
-        System.out.println(API_KEY);
+        //System.out.println(API_KEY);
 
         GeoApiContext context = new GeoApiContext.Builder()
                 .apiKey(API_KEY)

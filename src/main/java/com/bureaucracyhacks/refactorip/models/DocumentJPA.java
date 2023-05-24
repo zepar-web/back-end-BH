@@ -3,8 +3,6 @@ package com.bureaucracyhacks.refactorip.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
 @Entity
 @Table(name = "documents", uniqueConstraints = {
@@ -22,4 +20,15 @@ public class DocumentJPA {
     @Lob
     @Column(name="file")
     private byte[] file;
+
+
+    //join table for user and user_documents
+    //usable for actions on user_documents table
+    //you can retrieve specific columns from user_documents table
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_documents",
+            joinColumns = @JoinColumn(name = "document_id", referencedColumnName = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "status", referencedColumnName = "status")
+    )
+    private UserDocumentsJPA userDocumentInfo;
 }
