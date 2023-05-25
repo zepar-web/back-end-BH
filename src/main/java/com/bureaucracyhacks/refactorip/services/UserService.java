@@ -1,6 +1,7 @@
 package com.bureaucracyhacks.refactorip.services;
 
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
+import com.bureaucracyhacks.refactorip.exceptions.TaskAlreadyAssignedException;
 import com.bureaucracyhacks.refactorip.exceptions.TaskNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import com.bureaucracyhacks.refactorip.models.*;
@@ -9,6 +10,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import lombok.RequiredArgsConstructor;
+import okhttp3.internal.concurrent.Task;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -305,6 +307,12 @@ public class UserService implements UserDetailsService {
             throw new TaskNotFoundException();
         }
 
+        for(TaskJPA task1 : user.getTasks())
+        {
+            if(task1.equals(task))
+                throw new TaskAlreadyAssignedException();
+        }
+
         user.getTasks().add(task);
 
         userRepository.save(user);
@@ -329,10 +337,9 @@ public class UserService implements UserDetailsService {
             userDocument.setTask_id(Math.toIntExact(task.getId()));
             userDocument.setStatus("pending");
             userDocument.setUser_id(Math.toIntExact(user.getUser_id()));
-            user.getUserDocumentInfo().add(userDocument);
-
+            userDocumentsRepository.save(userDocument);
         }
-        userRepository.save(user);
+        //userRepository.save(user);
     }
 
     public boolean isAlreadyAdmin(String username) {

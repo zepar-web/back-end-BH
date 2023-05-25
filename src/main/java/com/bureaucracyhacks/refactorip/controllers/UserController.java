@@ -1,6 +1,7 @@
 package com.bureaucracyhacks.refactorip.controllers;
 
 import com.bureaucracyhacks.refactorip.exceptions.DocumentNotFoundException;
+import com.bureaucracyhacks.refactorip.exceptions.TaskAlreadyAssignedException;
 import com.bureaucracyhacks.refactorip.exceptions.TaskNotFoundException;
 import com.bureaucracyhacks.refactorip.exceptions.UserNotFoundException;
 import com.bureaucracyhacks.refactorip.services.AuthenticationService;
@@ -124,15 +125,18 @@ public class UserController {
         try {
             userService.addUserTask(username, taskName);
             userService.addUserDocumentsFromTask(username, taskName);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }catch (TaskNotFoundException e) {
+            return new ResponseEntity<>("Task not found!", HttpStatus.BAD_REQUEST);
+        }catch (TaskAlreadyAssignedException e)
+        {
+            return new ResponseEntity<>("Task already assigned!", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("User task added successfully!", HttpStatus.OK);
     }
 
     @GetMapping("/get-user-tasks")
     public ResponseEntity<?> getUserTasks(@RequestParam String username) {
-        List<String> userTasks = new ArrayList<>();
+        List<String> userTasks;
         try {
             userTasks = userService.getUserTasks(username);
         } catch (UserNotFoundException e) {
