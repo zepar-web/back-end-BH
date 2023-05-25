@@ -130,4 +130,15 @@ public class UserController {
         return new ResponseEntity<>("User task added successfully!", HttpStatus.OK);
     }
 
+    @GetMapping("/get-user-tasks")
+    public ResponseEntity<?> getUserTasks(@RequestParam String username) {
+        List<String> userTasks = new ArrayList<>();
+        try {
+            userTasks = userService.getUserTasks(username);
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>("User not found!", HttpStatus.BAD_REQUEST);
+        }
+        return ResponseEntity.ok().body(userTasks);
+    }
+
 }

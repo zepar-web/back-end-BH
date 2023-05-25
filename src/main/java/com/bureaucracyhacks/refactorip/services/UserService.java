@@ -339,4 +339,18 @@ public class UserService implements UserDetailsService {
         UserJPA user = userRepository.findByUsername(username).orElseThrow();
         return user.getRoles().contains(roleRepository.findByName("ROLE_ADMIN").orElseThrow());
     }
+
+
+    public List<String> getUserTasks(String username) {
+        UserJPA user;
+        try{
+            user = userRepository.findByUsername(username).orElseThrow();
+
+            return user.getTasks().stream().map(TaskJPA::getName).collect(Collectors.toList());
+        }
+        catch(NoSuchElementException e)
+        {
+            throw new UserNotFoundException();
+        }
+    }
 }
