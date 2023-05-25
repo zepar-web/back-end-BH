@@ -360,4 +360,24 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException();
         }
     }
+
+    public void forgotPassword(String email, String username, String newPassword) {
+        UserJPA user;
+        UserJPA user2;
+        try{
+            user = userRepository.findByUsername(username).orElseThrow();
+            user2 = userRepository.findByEmail(email).orElseThrow();
+
+            if(user.equals(user2))
+            {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+            }
+            else
+                throw new UserNotFoundException();
+        }catch (NoSuchElementException e)
+        {
+            throw new UserNotFoundException();
+        }
+    }
 }

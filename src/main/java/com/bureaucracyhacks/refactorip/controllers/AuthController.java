@@ -66,4 +66,17 @@ public class AuthController {
 
         return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email, @RequestParam String username, @RequestParam String newPassword)
+    {
+        try{
+            userService.forgotPassword(email, username, newPassword);
+        }
+        catch(Exception e)
+        {
+            return new ResponseEntity<>("Email or password is incorrect!", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Password changed successfully!", HttpStatus.OK);
+    }
 }
