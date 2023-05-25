@@ -8,6 +8,7 @@ import com.bureaucracyhacks.refactorip.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
@@ -43,5 +44,11 @@ public class AdminService {
         RoleJPA role = roleRepository.findByName("ROLE_USER").orElseThrow();
         user.setRole(role);
         userRepository.save(user);
+    }
+
+    public List<String> getAllAdmins() {
+        RoleJPA role = roleRepository.findByName("ROLE_ADMIN").orElseThrow();
+        List<UserJPA> admins = userRepository.findAllByRole(role);
+        return admins.stream().map(UserJPA::getUsername).toList();
     }
 }

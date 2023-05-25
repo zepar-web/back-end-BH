@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.List;
+
 @Setter
 @Getter
 @Entity
@@ -23,4 +25,5 @@ public class RoleJPA implements GrantedAuthority
     {
         return name;
     }
+
 }

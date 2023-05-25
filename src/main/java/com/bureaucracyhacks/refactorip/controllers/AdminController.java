@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin")
@@ -23,7 +26,10 @@ public class AdminController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> makeAdmin(@RequestParam String username) {
         System.out.println("User is now an admin");
-        if (userService.isUsernameTaken(username)) {
+        if(userService.isAlreadyAdmin(username)){
+            return new ResponseEntity<>("User is already an admin!", HttpStatus.BAD_REQUEST);
+        }
+        if (userService.isUsernameTaken(username)){
             adminService.makeAdmin(username);
             return new ResponseEntity<>("User is now admin!", HttpStatus.OK);
         }
@@ -44,5 +50,12 @@ public class AdminController {
         {
             return new ResponseEntity<>("User does not exist!", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/get-all-admins")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<String> getAllAdmins() {
+        //System.out.println("Getting all admins");
+        return adminService.getAllAdmins();
     }
 }

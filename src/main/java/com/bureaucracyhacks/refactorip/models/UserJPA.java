@@ -34,6 +34,13 @@ public class UserJPA {
     )
     private Set<RoleJPA> roles;
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    )
+    private RoleJPA role;
+
     public void setRole(RoleJPA role) {
         roles.clear();
         roles.add(role);

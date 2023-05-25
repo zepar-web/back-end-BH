@@ -334,4 +334,9 @@ public class UserService implements UserDetailsService {
         }
         userRepository.save(user);
     }
+
+    public boolean isAlreadyAdmin(String username) {
+        UserJPA user = userRepository.findByUsername(username).orElseThrow();
+        return user.getRoles().contains(roleRepository.findByName("ROLE_ADMIN").orElseThrow());
+    }
 }
